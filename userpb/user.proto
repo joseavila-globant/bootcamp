@@ -7,17 +7,33 @@ option go_package = "github.com/joseavila-globant/bootcamp/userpb";
 package userpb;
 
 // The greeting service definition.
-service Greeter {
+service User {
   // Sends a greeting
-  rpc SayHello (HelloRequest) returns (HelloReply) {}
+  rpc GetUser (UserRequest) returns (UserDetails) {}
+  rpc CreateUSer (UserDetails) returns (UserDetails) {}
+  rpc UpdateUser (UserDetails) returns (Generic){}
+  rpc DeleteUser (UserDetails) returns (Generic) {}
+  rpc Authenticate (UserDetails) returns (Generic){}
 }
 
 // The request message containing the user's name.
-message HelloRequest {
-  string name = 1;
+message UserRequest {
+  int64 id = 1;
+}
+message Parents {
+  repeated UserDetails parents = 1;
+}
+// The response message containing the greetings
+message UserDetails {
+  int64 id = 1;
+  string name = 2;
+  string email = 3;
+  string pwd = 4;
+  int32 age = 5;
+  optional Parents Parents = 6;
 }
 
-// The response message containing the greetings
-message HelloReply {
-  string message = 1;
+message Generic{
+  string code = 1;
+  optional string message = 2;
 }

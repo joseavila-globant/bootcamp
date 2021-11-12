@@ -32,15 +32,32 @@ const (
 	port = ":50051"
 )
 
-// server is used to implement helloworld.GreeterServer.
+// server is used to implement serServer.
 type server struct {
-	pb.UnimplementedGreeterServer
+	pb.UnimplementedUserServer
 }
 
-// SayHello implements helloworld.GreeterServer
-func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	log.Printf("Received: %v", in.GetName())
-	return &pb.HelloReply{Message: "Hello " + in.GetName()}, nil
+// GetUser implements GetUser.UserServer
+func (s *server) GetUser(ctx context.Context, in *pb.UserRequest) (*pb.UserDetails, error) {
+	log.Printf("Received: %v", in.GetId())
+	return &pb.UserDetails{
+		Id:      in.GetId(),
+		Name:    "Jose avila",
+		Email:   "jose.avila@globant.com",
+		Pwd:     "·····3",
+		Age:     29,
+		Parents: nil,
+	}, nil
+}
+
+func (s *server) CreateUser(ctx context.Context, in *pb.UserDetails) (*pb.UserDetails, error) {
+	return &pb.UserDetails{}, nil
+}
+func (s *server) UpdateUser(ctx context.Context, in *pb.UserDetails) (*pb.Generic, error) {
+	return &pb.Generic{}, nil
+}
+func (s *server) DeleteUser(ctx context.Context, in *pb.UserDetails) (*pb.Generic, error) {
+	return &pb.Generic{}, nil
 }
 
 func main() {
@@ -49,7 +66,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterGreeterServer(s, &server{})
+	pb.RegisterUserServer(s, &server{})
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
