@@ -40,11 +40,12 @@ type server struct {
 // GetUser implements GetUser.UserServer
 func (s *server) GetUser(ctx context.Context, in *pb.UserRequest) (*pb.UserDetails, error) {
 	log.Printf("Received: %v", in.GetId())
+	Pass := "-------3"
 	return &pb.UserDetails{
 		Id:      in.GetId(),
 		Name:    "Jose avila",
 		Email:   "jose.avila@globant.com",
-		Pwd:     "·····3",
+		Pwd:     &Pass,
 		Age:     29,
 		Parents: nil,
 	}, nil
