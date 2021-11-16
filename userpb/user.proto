@@ -10,10 +10,10 @@ package userpb;
 service User {
   // Sends a greeting
   rpc GetUser (UserRequest) returns (UserDetails) {}
-  rpc CreateUSer (UserDetails) returns (UserDetails) {}
-  rpc UpdateUser (UserDetails) returns (Generic){}
-  rpc DeleteUser (UserDetails) returns (Generic) {}
-  rpc Authenticate (UserDetails) returns (Generic){}
+  // rpc CreateUSer (UserDetails) returns (UserDetails) {}
+  // rpc UpdateUser (UserDetails) returns (Generic){}
+  // rpc DeleteUser (UserDetails) returns (Generic) {}
+  // rpc Authenticate (UserDetails) returns (Generic){}
 }
 
 // The request message containing the user's name.
