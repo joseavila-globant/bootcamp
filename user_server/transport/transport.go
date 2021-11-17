@@ -48,5 +48,11 @@ func decodeUserRequest(_ context.Context, request interface{}) (interface{}, err
 func decodeUserDetails(_ context.Context, response interface{}) (interface{}, error) {
 	resp := response.(endpoints.User)
 
-	return &pb.UserDetails{Id: resp.Id, Name: resp.Name, Email: resp.Email, Pwd: &resp.Pwd, Age: resp.Age, Parents: nil}, nil
+	return &pb.UserDetails{
+		Id:      resp.Id,
+		Name:    resp.Name,
+		Email:   resp.Email,
+		Pwd:     &resp.Pwd,
+		Age:     resp.Age,
+		Parents: nil}, nil
 }

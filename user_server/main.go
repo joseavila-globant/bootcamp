@@ -63,6 +63,7 @@ func main() {
 	grpcListener, err := net.Listen("tcp", port)
 	if err != nil {
 		logger.Log("error listening in port ", port, "error %v", err)
+		os.Exit(1)
 	}
 
 	go func() {

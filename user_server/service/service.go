@@ -24,7 +24,6 @@ func NewService(logger log.Logger) Service {
 
 func (s service) GetUser(ctx context.Context, in *pb.UserRequest) (*pb.UserDetails, error) {
 	s.logger.Log("Received: %v", in.GetId())
-	s.logger.Log("Msg", "Service id")
 	Pass := "123456"
 	return &pb.UserDetails{
 		Id:      in.GetId(),
