@@ -2,7 +2,8 @@ package transport
 
 import (
 	"context"
-	"log"
+
+	"github.com/go-kit/kit/log"
 
 	gt "github.com/go-kit/kit/transport/grpc"
 	"github.com/joseavila-globant/bootcamp/user_server/endpoints"
@@ -13,6 +14,8 @@ type gRPCServer struct {
 	getUser gt.Handler
 	pb.UnimplementedUserServer
 }
+
+var logs log.Logger
 
 func NewGRPCServer(endpoints endpoints.Endpoints, logger log.Logger) pb.UserServer {
 	return &gRPCServer{
@@ -28,8 +31,11 @@ func NewGRPCServer(endpoints endpoints.Endpoints, logger log.Logger) pb.UserServ
 func (s *gRPCServer) GetUser(ctx context.Context, req *pb.UserRequest) (*pb.UserDetails, error) {
 
 	resp, err := s.GetUser(ctx, req)
+	logs.Log("Msg", "trying to get user transport")
+
 	if err != nil {
-		log.Fatalf("could not get user GRPC : %v", err)
+		logs.Log("error", err)
+
 	}
 	return resp, nil
 }

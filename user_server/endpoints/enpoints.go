@@ -2,7 +2,8 @@ package endpoints
 
 import (
 	"context"
-	"log"
+
+	"github.com/go-kit/kit/log"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/joseavila-globant/bootcamp/user_server/service"
@@ -16,6 +17,8 @@ type Endpoints struct {
 type UserRequest struct {
 	Id int64 `json:"id"`
 }
+
+var logs log.Logger
 
 type User struct {
 	Id      int64  `json:"id"`
@@ -35,9 +38,14 @@ func MakeEndpoints(s service.Service) Endpoints {
 func makeGetUserEndpoint(s service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(UserRequest)
+		logs.Log("Msg", "trying to get user endpoints")
+
 		User, err := s.GetUser(ctx, &pb.UserRequest{Id: req.Id})
+
 		if err != nil {
-			log.Fatalf("could not get user: %v", err)
+
+			logs.Log("error:", err)
+
 		}
 		return User, nil
 

@@ -20,10 +20,17 @@
 package main
 
 import (
-	"context"
-	"log"
+	"fmt"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
+	"github.com/joseavila-globant/bootcamp/user_server/endpoints"
+	"github.com/joseavila-globant/bootcamp/user_server/service"
+	transport "github.com/joseavila-globant/bootcamp/user_server/transport"
 	pb "github.com/joseavila-globant/bootcamp/userpb"
 	"google.golang.org/grpc"
 )
@@ -33,43 +40,39 @@ const (
 )
 
 // server is used to implement serServer.
-type server struct {
-	pb.UnimplementedUserServer
-}
-
-// GetUser implements GetUser.UserServer
-func (s *server) GetUser(ctx context.Context, in *pb.UserRequest) (*pb.UserDetails, error) {
-	log.Printf("Received: %v", in.GetId())
-	Pass := "-------3"
-	return &pb.UserDetails{
-		Id:      in.GetId(),
-		Name:    "Jose avila",
-		Email:   "jose.avila@globant.com",
-		Pwd:     &Pass,
-		Age:     29,
-		Parents: nil,
-	}, nil
-}
-
-func (s *server) CreateUser(ctx context.Context, in *pb.UserDetails) (*pb.UserDetails, error) {
-	return &pb.UserDetails{}, nil
-}
-func (s *server) UpdateUser(ctx context.Context, in *pb.UserDetails) (*pb.Generic, error) {
-	return &pb.Generic{}, nil
-}
-func (s *server) DeleteUser(ctx context.Context, in *pb.UserDetails) (*pb.Generic, error) {
-	return &pb.Generic{}, nil
-}
+// type server struct {
+// 	pb.UnimplementedUserServer
+// }
 
 func main() {
-	lis, err := net.Listen("tcp", port)
+	var logger log.Logger
+	logger = log.NewJSONLogger(os.Stdout)
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
+	logger = log.With(logger, "caller", log.DefaultCaller)
+
+	getUserService := service.NewService(logger)
+	getUserEndpoint := endpoints.MakeEndpoints(getUserService)
+	grpcServer := transport.NewGRPCServer(getUserEndpoint, logger)
+	errs := make(chan error)
+	go func() {
+		c := make(chan os.Signal)
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM, syscall.SIGALRM)
+		errs <- fmt.Errorf("%s", <-c)
+	}()
+
+	grpcListener, err := net.Listen("tcp", port)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		logger.Log("error listening in port ", port, "error %v", err)
 	}
-	s := grpc.NewServer()
-	pb.RegisterUserServer(s, &server{})
-	log.Printf("server listening at %v", lis.Addr())
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+
+	go func() {
+		baseServer := grpc.NewServer()
+		pb.RegisterUserServer(baseServer, grpcServer)
+
+		level.Info(logger).Log("msg", "Server started")
+		baseServer.Serve(grpcListener)
+
+	}()
+	level.Error(logger).Log("exit", <-errs)
+
 }
